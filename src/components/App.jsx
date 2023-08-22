@@ -2,12 +2,14 @@ import { Component } from 'react';
 import { Container } from './Container/Container.styled';
 import { TodoList } from './TodoList/TodoList';
 import { TodoEditor } from './TodoEditor/TodoEditor';
+import { Filter } from './FIlter/Filter';
 import todos from './todo.json';
 import shortid from 'shortid';
 
 export class App extends Component {
   state = {
     todos,
+    filter: '',
   };
 
   addTodo = text => {
@@ -36,12 +38,28 @@ export class App extends Component {
     }));
   };
 
+  changeFilter = e => {
+    this.setState({ filter: e.currentTarget.value });
+  };
+
+  getVisibleTodos = () => {
+    const { filter, todos } = this.state;
+    const normalizedFilter = filter.toLowerCase();
+
+    return todos.filter(todo =>
+      todo.text.toLowerCase().includes(normalizedFilter)
+    );
+  };
+
   render() {
+    const visibleTodos = this.getVisibleTodos();
+
     return (
       <Container>
         <TodoEditor onSubmit={this.addTodo} />
+        <Filter value={this.state.filter} changeFilter={this.changeFilter} />
         <TodoList
-          todos={this.state.todos}
+          todos={visibleTodos}
           onDelete={this.deleteTodo}
           onToggleCompleted={this.onToggleCompleted}
         />
